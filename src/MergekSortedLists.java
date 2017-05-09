@@ -18,41 +18,41 @@ public class MergekSortedLists {
     }
 
     public static ListNode mergeKLists(ListNode[] lists) {
-        if (lists == null || lists.length == 0) return null;
         List<ListNode> list = new ArrayList<>();
-        for (ListNode node : lists) {
-            if (node != null) {
-                list.add(node);
-            }
-        }
-        ListNode result = new ListNode(-1);
-        ListNode temp = result;
-        while (list.size() > 0) {
-            temp.next = mergeHeadLists(list);
-            temp = temp.next;
-            System.out.println(temp.val);
-        }
-        return result.next;
+        Collections.addAll(list, lists);
+        return mergeKLists(list);
     }
 
-    public static ListNode mergeHeadLists(List<ListNode> list) {
-        int index = 0;
-        int minValue = list.get(index).val;
-        for (int i = 1; i < list.size(); i++) {
-            if (list.get(i).val < minValue) {
-                minValue = list.get(i).val;
-                index = i;
+    public static ListNode mergeKLists(List<ListNode> lists) {
+        if (lists == null || lists.size() == 0) return null;
+        if (lists.size() == 1) return lists.get(0);
+
+        int length = lists.size();
+        int mid = (length - 1) / 2;
+        ListNode l1 = mergeKLists(lists.subList(0, mid + 1));
+        ListNode l2 = mergeKLists(lists.subList(mid + 1, length));
+        return merge2Lists(l1, l2);
+    }
+
+    public static ListNode merge2Lists(ListNode l1, ListNode l2) {
+        ListNode head = new ListNode(-1);
+        ListNode temp = head;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                temp.next = l1;
+                l1 = l1.next;
+            } else {
+                temp.next = l2;
+                l2 = l2.next;
             }
+            temp = temp.next;
         }
-        ListNode node = list.get(index);
-        ListNode temp = new ListNode(node.val);
-        node = node.next;
-        if (node == null) {
-            list.remove(index);
-        } else {
-            list.set(index, node);
+        if (l1 != null) {
+            temp.next = l1;
+        } else if (l2 != null) {
+            temp.next = l2;
         }
-        return temp;
+        return head.next;
     }
 
     public static class ListNode {
@@ -61,6 +61,11 @@ public class MergekSortedLists {
 
         ListNode(int x) {
             val = x;
+        }
+
+        @Override
+        public String toString() {
+            return val + "";
         }
     }
 }

@@ -857,3 +857,97 @@ public class Solution {
     }
 }
 ```
+
+## 23. Merge k Sorted Lists 
+题目：合并多个有序的节点列表，要求按大小排列。
+最初是两两从头合并导致 TLE。之后使用归并排序来进行优化。
+`归并操作：将两个顺序合并成一个顺序序列的方法`
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        List<ListNode> list = new ArrayList<>();
+        Collections.addAll(list, lists);
+        return mergeKLists(list);
+    }
+
+   public ListNode mergeKLists(List<ListNode> lists) {
+        if (lists == null || lists.size() == 0) return null;
+        if (lists.size() == 1) return lists.get(0);
+
+        int length = lists.size();
+        int mid = (length - 1) / 2;
+        ListNode l1 = mergeKLists(lists.subList(0, mid + 1));
+        ListNode l2 = mergeKLists(lists.subList(mid + 1, length));
+        return merge2Lists(l1, l2);
+    }
+    
+    public  ListNode merge2Lists(ListNode l1, ListNode l2) {
+        ListNode head = new ListNode(-1);
+        ListNode temp = head;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                temp.next = l1;
+                l1 = l1.next;
+            } else {
+                temp.next = l2;
+                l2 = l2.next;
+            }
+            temp = temp.next;
+        }
+        if (l1 != null) {
+            temp.next = l1;
+        } else if (l2 != null) {
+            temp.next = l2;
+        }
+        return head.next;
+    }
+}
+```
+
+## 24. Swap Nodes in Pairs 
+题目： 给出一个字节列表，两个数为一组进行交换。节点里面的 val 是无法被改变的。
+```
+Given 1->2->3->4, you should return the list as 2->1->4->3. 
+```
+
+交换时要知道四个数，交换的i1和i2，i1前一个数i0,i2的后一个数i3.
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode v = new ListNode(-1);
+        v.next = head;
+        ListNode res = v;
+        while (v.next != null && v.next.next != null) {
+            ListNode temp = v.next;
+            ListNode l1 = temp.next;
+            ListNode l2 = temp.next.next;
+            l1.next = temp;
+            temp.next = l2;
+            v.next = l1;
+            v = v.next.next;
+        }
+        return res.next;
+    }
+}
+```
