@@ -951,3 +951,63 @@ public class Solution {
     }
 }
 ```
+
+## 25. Reverse Nodes in k-Group 
+题目：给出一组节点列表和一个数字，按组来反转节点，组里面数字的个数为输入时给出的数字。
+```
+For example,
+Given this linked list: 1->2->3->4->5
+For k = 2, you should return: 2->1->4->3->5
+For k = 3, you should return: 3->2->1->4->5 
+```
+
+我的解法是先将所有 ListNode 放入队列中，再按照K值来进行反转。
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode reverseKGroup(ListNode head, int k) {
+        if (head == null || head.next == null) return head;
+        List<ListNode> nodeList = new ArrayList<>();
+        while (head != null) {
+            nodeList.add(head);
+            head = head.next;
+        }
+        int size = nodeList.size();
+        int start = 0;
+        while (size >= k) {
+            swapNodes(nodeList, start, start + k - 1);
+            size = size - k;
+            start = start + k;
+        }
+        ListNode v = nodeList.get(0);
+        ListNode temp = v;
+        for (int i = 1; i < nodeList.size(); i++) {
+            temp.next = nodeList.get(i);
+            temp = temp.next;
+        }
+        temp.next = null;
+        return v;
+    }
+    
+    public void swapNodes(List<ListNode> list, int start, int end) {
+        if (end >= list.size()) {
+            return;
+        }
+        while (start < end) {
+            ListNode temp = list.get(start);
+            list.set(start, list.get(end));
+            list.set(end, temp);
+            start++;
+            end--;
+        }
+    }
+}
+```
