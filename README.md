@@ -1011,3 +1011,57 @@ public class Solution {
     }
 }
 ```
+
+## 26. Remove Duplicates from Sorted Array
+题目：给出一组有序的数组，移除重复的数字后，输出不重复数字的个数。不允许分配新的空间来存储数组。
+```
+Given input array nums = [1,1,2]
+output:length = 2,nums = [1,2]
+```
+直接将重复的数字用之后不重复的数字覆盖过去，这样输出的数组就能够不存在重复的数字了。
+```java
+public class Solution {
+    public int removeDuplicates(int[] nums) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        int res = 1;
+        int temp = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] != temp) {
+                temp = nums[i];
+                nums[res] = nums[i];
+                res++;
+            }
+        }
+        return res;
+    }
+}
+```
+
+## 27. Remove Element
+题目：给出一组有序的数组和一个给定的值，从数组中移除给定的数字后，输出数组长度。不允许分配新的空间来存储数组
+```
+Given input array nums = [3,2,2,3], val = 3
+
+Your function should return length = 2, with the first two elements of nums being 2.
+```
+
+解题与 # 26 思路一样，同样是碰到指定的值后使用后面的值来进行覆盖。
+```java
+public class Solution {
+    public int removeElement(int[] nums, int val) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != val) {
+                nums[res] = nums[i];
+                res++;
+            }
+        }
+        return res;
+    }
+}
+```
