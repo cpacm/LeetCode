@@ -1065,3 +1065,17 @@ public class Solution {
     }
 }
 ```
+
+## 28. Implement strStr()
+题目：给出两个字符串，求子串在父串的的位置，若不匹配返回-1.
+
+之前以为 indexOf() n*m 的时间复杂度会导致TLE，便想先看看KMP的算法或者Sunday算法来缩减复杂度，后来试了一下发现n*m的时间复杂度能够直接AC.
+
+```java
+public class Solution {
+    public int strStr(String haystack, String needle) {
+        return haystack.indexOf(needle);
+    }
+}
+```
+
