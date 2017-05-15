@@ -1079,3 +1079,43 @@ public class Solution {
 }
 ```
 
+## 29. Divide Two Integers
+题目：给出两个数进行相除，要求程序不能使用乘法，除法和求模的运算。数值溢出使用最大值。
+
+刚开始直接使用减法来求值，最后导致 TLE . 换一种思路，任何一个整数可以表示成以2的幂为底的一组基的线性组合，即num=a_0*2^0+a_1*2^1+a_2*2^2+...+a_n*2^n。时间复杂度为 O(logn).
+```
+63/4 = 15;
+63 = 32+16+8+4+3 = 4*2^3+4*2^2+4*2^1+4*2^0+3=(8+4+2+1)*4+3 = 63
+```
+注意正负数和数值的溢出。
+```java
+public class Solution {
+    public int divide(int dividend, int divisor) {
+        int sign = 1;
+        if (dividend < 0) sign = -sign;
+        if (divisor < 0) sign = -sign;
+        long temp = Math.abs((long) dividend);
+        long temp2 = Math.abs((long) divisor);
+        long c = 1;
+        while (temp > temp2) {
+            temp2 = temp2 << 1;
+            c = c << 1;
+        }
+        long res = 0;
+        while (temp >= Math.abs((long) divisor)) {
+            while (temp >= temp2) {
+                temp -= temp2;
+                res += c;
+            }
+            temp2 = temp2 >> 1;
+            c = c >> 1;
+        }
+        if (sign > 0) {
+            if (res > Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE;
+            }
+            return (int) res;
+        } else return -(int) res;
+    }
+}
+```
