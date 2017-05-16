@@ -372,37 +372,39 @@ isMatch("aab", "c*a*b") → true
 ```
 
 ```java
-public boolean isMatch(String s, String p) {
-        if (s == null || p == null) {
-            return false;
-        }
-        int m = s.length();
-        int n = p.length();
-        boolean[][] dp = new boolean[m + 1][n + 1];
-        dp[0][0] = true;
-        for (int j = 0; j < n; j++) {
-            if (p.charAt(j) == '*') {
-                dp[0][j + 1] = dp[0][j - 1];
+public class Solution {
+    public boolean isMatch(String s, String p) {
+            if (s == null || p == null) {
+                return false;
             }
-        }
-        for (int i = 0; i < m; i++) {
+            int m = s.length();
+            int n = p.length();
+            boolean[][] dp = new boolean[m + 1][n + 1];
+            dp[0][0] = true;
             for (int j = 0; j < n; j++) {
-                if (p.charAt(j) == '.') {
-                    dp[i + 1][j + 1] = dp[i][j];
-                }
-                if (p.charAt(j) == s.charAt(i)) {
-                    dp[i + 1][j + 1] = dp[i][j];
-                }
                 if (p.charAt(j) == '*') {
-                    if (p.charAt(j - 1) != s.charAt(i) && p.charAt(j - 1) != '.') {
-                        dp[i + 1][j + 1] = dp[i + 1][j - 1];
-                    } else {
-                        dp[i + 1][j + 1] = dp[i + 1][j - 1] || dp[i + 1][j] || dp[i][j + 1];
+                    dp[0][j + 1] = dp[0][j - 1];
+                }
+            }
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (p.charAt(j) == '.') {
+                        dp[i + 1][j + 1] = dp[i][j];
+                    }
+                    if (p.charAt(j) == s.charAt(i)) {
+                        dp[i + 1][j + 1] = dp[i][j];
+                    }
+                    if (p.charAt(j) == '*') {
+                        if (p.charAt(j - 1) != s.charAt(i) && p.charAt(j - 1) != '.') {
+                            dp[i + 1][j + 1] = dp[i + 1][j - 1];
+                        } else {
+                            dp[i + 1][j + 1] = dp[i + 1][j - 1] || dp[i + 1][j] || dp[i][j + 1];
+                        }
                     }
                 }
             }
+            return dp[m][n];
         }
-        return dp[m][n];
     }
 ```
 
@@ -412,20 +414,22 @@ public boolean isMatch(String s, String p) {
 常规思路是输入一个值然后跟前面一一比较，这样导致时间复杂度为 nlogn 。但因为值是一口气给你的，所有可以从两边开始缩进，毕竟面积取决于短板。
 
 ```java
-public int maxArea(int[] height) {
-    int maxArea = 0;
-    int start = 0;
-    int end = height.length - 1;
-    while (start < end) {
-        int area = Math.min(height[start], height[end]) * (end - start);
-        if (height[start] <= height[end]) {
-            start++;
-        } else {
-            end--;
+public class Solution {
+    public int maxArea(int[] height) {
+        int maxArea = 0;
+        int start = 0;
+        int end = height.length - 1;
+        while (start < end) {
+            int area = Math.min(height[start], height[end]) * (end - start);
+            if (height[start] <= height[end]) {
+                start++;
+            } else {
+                end--;
+            }
+            maxArea = Math.max(maxArea, area);
         }
-        maxArea = Math.max(maxArea, area);
+        return maxArea;
     }
-    return maxArea;
 }
 ```
 
@@ -1119,3 +1123,52 @@ public class Solution {
     }
 }
 ```
+
+## 30. Substring with Concatenation of All Words `TLE`
+题目：给定一个字符串S和一个字符串数组L，L中的字符串长度都相等，找出S中所有的子串恰好包含L中所有字符各一次，返回子串的起始位置。
+```
+s: "barfoothefoobarman"
+words: ["foo", "bar"]
+
+You should return the indices: [0,9].
+```
+
+使用map将数组中的字符串记录下来，从字符串截取字符来进行匹配。但是在最后的 case 中会出现 TLE.在网上找到的资料是说可以使用 slide window 的算法来实现，等待以后来学习。
+```java
+/**
+* 这是 TLE 的代码
+ *  */
+public class Solution {
+    public List<Integer> findSubstring(String s, String[] words) {
+        List<Integer> res = new ArrayList<>();
+        if (s.length() == 0 || words.length == 0) {
+            return res;
+        }
+        Map<String, Integer> map = new HashMap<>();
+        for (String str : words) {
+            map.put(str, map.containsKey(str) ? map.get(str) + 1 : 1);
+        }
+        int len = words[0].length();
+        for (int i = 0; i <= s.length() - len * words.length; i++) {
+            HashMap<String, Integer> tempMap = new HashMap<>(map);
+            int temp = i;
+            int count = 0;
+            String tempStr = s.substring(temp, temp + len);
+            while (tempMap.containsKey(tempStr) && tempMap.get(tempStr) > 0) {
+                tempMap.put(tempStr, tempMap.get(tempStr) - 1);
+                temp = temp + len;
+                count++;
+                if (temp + len <= s.length()) {
+                    tempStr = s.substring(temp, temp + len);
+                } else {
+                    break;
+                }
+            }
+            if (count == words.length) {
+                res.add(i);
+            }
+        }
+        return res;
+    }
+}
+````
