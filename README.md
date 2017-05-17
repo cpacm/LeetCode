@@ -1172,3 +1172,56 @@ public class Solution {
     }
 }
 ````
+
+## 31. Next Permutation
+题目：给出一个序列，寻找比当前排列顺序大的下一个排列。规则如下：
+```
+1,2,3 ->next
+1,3,2 ->next
+2,1,3 ->next
+2,3,1 ->next
+3,1,2 ->next
+3,2,1 ->next
+1,2,3 ->loop
+```
+因为是找递增的下一个排列，所以从后往前找到第一个升序对的位置，如1,2,4,3,1， 从后向前找就是2,4,3,1，因为2比前一个数4小，所以就锁定2这个数。
+之后就是在4,3,1中找到比2大的最小的那个数3，将3与2对换得到降序排列4,2,1.然后就是将4,2,1反序得到1,2,4.最终结果就是1,3,1,2,4
+
+```java
+public class Solution {
+    public void nextPermutation(int[] nums) {
+        if (nums.length == 0 || nums.length == 1) return;
+        int len = nums.length;
+        int index = len - 1;
+        int value = nums[index];
+        for (index = index - 1; index >= 0; index--) {
+            if (nums[index] < value) {
+                value = nums[index];
+                break;
+            }
+            value = nums[index];
+        }
+        if (index < 0) {
+            reversal(nums, 0, len - 1);
+        } else {
+            for (int j = len - 1; j > index; j--) {
+                if (nums[j] > value) {
+                    nums[index] = nums[j];
+                    nums[j] = value;
+                    reversal(nums, index + 1, len - 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void reversal(int[] nums, int start, int end) {
+        int len = end + 1 - start;
+        for (int i = 0; i < len / 2; i++) {
+            int k = nums[start + i];
+            nums[start + i] = nums[end - i];
+            nums[end - i] = k;
+        }
+    }
+}
+````
