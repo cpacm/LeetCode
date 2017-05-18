@@ -1225,3 +1225,32 @@ public class Solution {
     }
 }
 ````
+
+## 32. Longest Valid Parentheses
+题目：输入一串只包含"(",")"的字符串，求合法子串的最大值。
+```
+")()())", where the longest valid parentheses substring is "()()", which has length = 4.
+```
+一道很容易TLE的题目，最优解法是使用 stack 记录字符串中"("出现时的index，当出现")"进行匹配时相减得到长度。
+```java
+public class Solution {
+    public int longestValidParentheses(String s) {
+        if (s.isEmpty()) return 0;
+        Stack<Integer> ms = new Stack<>();
+        int maxlen = 0;
+        int last = -1;  // Position of the last unmatched ')'
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') ms.push(i); //
+            else if (ms.empty()) last = i; // == ')' and the stack is empty, it means this is a non-matching ')'
+            else {
+                ms.pop();           // pops the matching '('.
+                if (ms.empty()) // If there is nothing left in the stack, it means this ')' matches a '(' after the last unmatched ')'
+                    maxlen = Math.max(maxlen, i - last);
+                else    // otherwise,
+                    maxlen = Math.max(maxlen, i - ms.peek());
+            }
+        }
+        return maxlen;
+    }
+}
+```
