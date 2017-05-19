@@ -1254,3 +1254,82 @@ public class Solution {
     }
 }
 ```
+
+## 33.Search in Rotated Sorted Array
+题目：给出一组有序的数组，如 `0 1 2 4 5 6 7`，将其分成两段并互换，比如会成为`4 5 6 7 0 1 2`。给出一个 target 值，求在数组中的位置，若不存在输出-1
+
+一种最简单的方法是直接遍历过，时间复杂度为O(n),另一种是先使用 binary search 找出旋转点（最小值）所在的位置，之后在用二分遍历一次获得 target 所在的位置。
+
+```java
+/**
+* 简单遍历
+*/
+public class Solution {
+    public int search(int[] nums, int target) {
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+```
+
+## 34. Search for a Range
+题目：给出一个有序的数组和一个目标值，求该目标值在数组的范围（由于目标值在数组中存在好几个）。要求时间复杂度为O(logn)
+```
+For example,
+Given [5, 7, 7, 8, 8, 10] and target value 8,
+return [3, 4].
+```
+
+一个很简单的二分查找题，要注意的是即使找到一个目标值也要继续向左右查找下去以便确定目标值在数组中的范围。
+```java
+public class Solution {
+    public int[] searchRange(int[] nums, int target) {
+        int start = -1, end = -1;
+        int st = 0, len = nums.length - 1;
+        while (st <= len) {
+            int mid = (len + st + 1) / 2;
+            if (nums[mid] == target) {
+                start = binarySearch(nums, st, mid - 1, target, true);
+                end = binarySearch(nums, mid + 1, len, target, false);
+                if (start == -1) start = mid;
+                if (end == -1) end = mid;
+                break;
+            } else if (nums[mid] > target) {
+                len = mid - 1;
+            } else if (nums[mid] < target) {
+                st = mid + 1;
+            }
+        }
+        return new int[]{start, end};
+    }
+
+    public int binarySearch(int[] nums, int start, int end, int target, boolean left) {
+        if (start > end) {
+            return -1;
+        }
+        int mid = (start + end + 1) / 2;
+        int index = -1;
+        if (nums[mid] == target) {
+            if (left) {
+                index = binarySearch(nums, start, mid - 1, target, left);
+            } else {
+                index = binarySearch(nums, mid + 1, end, target, left);
+            }
+            if (index == -1) {
+                return mid;
+            }
+            return index;
+        } else if (nums[mid] > target) {
+            return binarySearch(nums, start, mid - 1, target, left);
+        } else if (nums[mid] < target) {
+            return binarySearch(nums, mid + 1, end, target, left);
+        } else {
+            return index;
+        }
+    }
+}
+```
