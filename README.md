@@ -1333,3 +1333,70 @@ public class Solution {
     }
 }
 ```
+
+## 35. Search Insert Position
+题目：给出一组有序数组和一个目标数字，求目标数字在数组中的位置，没找到时则求插入数组的位置。
+```
+Here are few examples.
+[1,3,5,6], 5 → 2
+[1,3,5,6], 2 → 1
+[1,3,5,6], 7 → 4
+[1,3,5,6], 0 → 0
+```
+一道简单的二分查找题
+```java
+public class Solution {
+    public int searchInsert(int[] nums, int target) {
+        int len = nums.length;
+        int start = 0;
+        int end = len - 1;
+        int index = start;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (target > nums[mid]) {
+                start = mid + 1;
+                index = start;
+            } else if (target < nums[mid]) {
+                end = mid - 1;
+                index = mid;
+            } else {
+                return mid;
+            }
+        }
+        return index;
+    }
+}
+````
+
+## 36. Valid Sudoku
+题目：给出九个字符串，每个字符串有数字和 '.'组成，'.'表示要填写的数字，判断这九个字符串能否组成一个有效的数独。
+有效数独：每个单元，每行，每列都必须有1-9组成，不能重复。不一定要求有解。
+
+![sudoku](https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Sudoku-by-L2G-20050714.svg/250px-Sudoku-by-L2G-20050714.svg.png)
+
+不要傻乎乎的循环去求每行每列和每个单元是否存在重复数字，可以给每个数字进行位置标记，再利用set看是否有重复。
+```
+    '4' in row 7 is encoded as "(4)7".
+    '4' in column 7 is encoded as "7(4)".
+    '4' in the top-right block is encoded as "0(4)2".
+```
+
+```java
+public class Solution {
+
+    public boolean isValidSudoku(char[][] board) {
+        Set seen = new HashSet();
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 9; ++j) {
+                if (board[i][j] != '.') {
+                    String b = "(" + board[i][j] + ")";
+                    if (!seen.add(b + i) || !seen.add(j + b) || !seen.add(i / 3 + b + j / 3))
+                        return false;
+                }
+            }
+        }
+        return true;
+    }
+
+}
+```
