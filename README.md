@@ -1400,3 +1400,62 @@ public class Solution {
 
 }
 ```
+
+## 37. Sudoku Solver
+题目：给出一个有效的数独表，求空缺值。假设必定有解。
+
+![blank sudoku](https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Sudoku-by-L2G-20050714.svg/250px-Sudoku-by-L2G-20050714.svg.png)
+![filled_sudoku](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Sudoku-by-L2G-20050714_solution.svg/250px-Sudoku-by-L2G-20050714_solution.svg.png)
+
+使用回溯来求解，每个空格可以填1-9的值，每填入一个值去判断数独表是否是有效的数独表，若有效填写下一个无效则循环0-9,循环结束后没有找到值则回到上一个。
+
+```java
+public class Solution {
+    public void solveSudoku(char[][] board) {
+        sudoku(board, 0,0);
+    }
+
+    public boolean sudoku(char[][] board, int i, int j) {
+        if (j >= 9) {
+            return sudoku(board, i + 1, 0);
+        }
+        if (i >= 9) {
+            return true;
+        }
+        char c = board[i][j];
+        if (c != '.') {
+            return sudoku(board, i, j + 1);
+        } else {
+            for (int k = 1; k <= 9; k++) {
+                char cc = (char) (k + '0');
+                board[i][j] = cc;
+                if (isValidSudoku(i, j, board)) {
+                    if (sudoku(board, i, j + 1)) {
+                        return true;
+                    }
+                }
+                board[i][j] = '.';
+            }
+        }
+        return false;
+    }
+
+    public boolean isValidSudoku(int i, int j, char[][] board) {
+        for (int k = 0; k < 9; k++) {
+            if (k != j && board[i][k] == board[i][j])
+                return false;
+        }
+        for (int k = 0; k < 9; k++) {
+            if (k != i && board[k][j] == board[i][j])
+                return false;
+        }
+        for (int row = i / 3 * 3; row < i / 3 * 3 + 3; row++) {
+            for (int col = j / 3 * 3; col < j / 3 * 3 + 3; col++) {
+                if ((row != i || col != j) && board[row][col] == board[i][j])
+                    return false;
+            }
+        }
+        return true;
+    }
+}
+```
