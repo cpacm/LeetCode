@@ -1459,3 +1459,86 @@ public class Solution {
     }
 }
 ```
+
+## 38. Count and Say
+题目：n=1时输出字符串1；n=2时，数上次字符串中的数值个数，因为上次字符串有1个1，所以输出11；n=3时，由于上次字符是11，有2个1，所以输出21；n=4时，由于上次字符串是21，有1个2和1个1，所以输出1211。依次类推，写个countAndSay(n)函数返回字符串。
+```
+1, 11, 21, 1211, 111221, ...
+
+1 is read off as "one 1" or 11.
+11 is read off as "two 1s" or 21.
+21 is read off as "one 2, then one 1" or 1211.
+```
+
+这道题理解了题意就是一道简单题，代码如下：
+```java
+public class Solution {
+    public String countAndSay(int n) {
+        String result = "1";
+        if (n <= 1) {
+            return result;
+        }
+        for (int i = 1; i < n; i++) {
+            StringBuilder res = new StringBuilder();
+            int count = 1;
+            char c = result.charAt(0);
+            for (int j = 1; j < result.length(); j++) {
+                if (c == result.charAt(j)) {
+                    count++;
+                } else {
+                    res.append(count).append(c);
+                    count = 1;
+                    c = result.charAt(j);
+                }
+            }
+            res.append(count).append(c);
+            result = res.toString();
+        }
+        return result;
+    }
+}
+```
+
+## 39. Combination Sum
+题目：给出一组数字和一个目标数，数组内部的数字不重复，但可以多次使用。求数组里面和为目标数的组合。要求组合不能重复。
+```
+For example, given candidate set [2, 3, 6, 7] and target 7,
+A solution set is:
+[
+  [7],
+  [2, 2, 3]
+]
+```
+递归求解。
+1）当目标值与当前所选择的值相等时，将组合加入列表时。
+2）当目标值大于所选择的值时，将值加入组合并将目标值减去选择值进入下一轮递归。
+3）当目标值小于所选择的值，跳过当前值。
+
+```java
+public class Solution {
+    List<List<Integer>> cs = new ArrayList<>();
+
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        sum(candidates, target, new ArrayList<>(), 0);
+        return cs;
+    }
+
+    public void sum(int[] candidates, int target, List<Integer> list, int index) {
+        for (int i = index; i < candidates.length; i++) {
+            List<Integer> temp = new ArrayList<>(list);
+            if (target == candidates[i]) {
+                temp.add(candidates[i]);
+                cs.add(temp);
+                continue;
+            } else if (candidates[i] > target) {
+                sum(candidates, target, temp, i + 1);
+                break;
+            } else if (target > candidates[i]) {
+                temp.add(candidates[i]);
+                sum(candidates, target - candidates[i], temp, i);
+            }
+
+        }
+    }
+}
+```
