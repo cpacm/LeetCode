@@ -1542,3 +1542,65 @@ public class Solution {
     }
 }
 ```
+
+## 40. Combination Sum II
+题目：给出一组数字和一个目标数，数组内部的数字有重复，且只能使用一次。求数组里面和为目标数的组合。要求组合不能重复
+```
+For example, given candidate set [10, 1, 2, 7, 6, 1, 5] and target 8,
+A solution set is:
+
+[
+  [1, 7],
+  [1, 2, 5],
+  [2, 6],
+  [1, 1, 6]
+]
+```
+
+我使用的方法是使用map来去重和记录数字重复的个数，虽然也能AC但map的寻址拖慢了整个运行速度。最优的解法是先对数组进行排序，当遇到重复的数字时跳过重复的步骤。
+
+```java
+/**
+* 有待优化的代码
+*/
+public class Solution {
+    List<List<Integer>> cs = new ArrayList<>();
+
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < candidates.length; i++) {
+            map.put(candidates[i], map.getOrDefault(candidates[i], 0) + 1);
+        }
+        sum(target, new ArrayList<>(), map);
+        return cs;
+    }
+
+    public void sum(int target, List<Integer> list, Map<Integer, Integer> map) {
+        Set<Integer> keys = map.keySet();
+        Map<Integer, Integer> tempMap = new HashMap<>(map);
+        for (int key : keys) {
+            List<Integer> temp = new ArrayList<>(list);
+            int value = tempMap.get(key);
+            if (target == key) {
+                temp.add(key);
+                cs.add(temp);
+                tempMap.remove(key);
+                continue;
+            } else if (key > target) {
+                tempMap.remove(key);
+                sum(target, temp, tempMap);
+                break;
+            } else if (target > key) {
+                temp.add(key);
+                if (value > 1) {
+                    tempMap.put(key, tempMap.get(key) - 1);
+                } else {
+                    tempMap.remove(key);
+                }
+                sum(target - key, temp, tempMap);
+                tempMap.remove(key);
+            }
+        }
+    }
+}
+```
