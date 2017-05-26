@@ -1604,3 +1604,43 @@ public class Solution {
     }
 }
 ```
+
+## 41. First Missing Positive
+题目：给出一组无序数组，找出第一个缺少的正整数。要求时间复杂度为O(n),空间为O(1)
+```
+For example,
+Given [1,2,0] return 3,
+and [3,4,-1,1] return 2.
+```
+正整数从1开始，所以可以将数组的下标序号与此一一对应。
+比如说4,3,6,1,5的数组，第一个数为4,，则与第四个数交换 -> 1,3,6,4,5. 此时第一个数为1，不再交换进行下一轮。
+第二个数为3，则与第三个数交换 -> 1,6,3,4,5.此时第2个数为6，没有与序号对应需要再次交换，但此时6已经超过数组的长度所以跳过进入下一轮。
+第三个数为3，与序号相等,下一轮...
+直到完全交换完成，再次遍历整个数组，找出第一个没有对应的序号则是我们要求的数，这个例子则是为第二个数，所以返回2.
+```java
+public class Solution {
+    public int firstMissingPositive(int[] nums) {
+        int i = 0;
+        while (i < nums.length) {
+            int value = nums[i];
+            if (value == i + 1 || value <= 0 || value >= nums.length) {
+                i++;
+            } else {
+                int temp = nums[value - 1];
+                if (temp == nums[i]) {
+                    i++;
+                    continue;
+                }
+                nums[value - 1] = nums[i];
+                nums[i] = temp;
+            }
+        }
+        for (int k = 0; k < nums.length; k++) {
+            if (nums[k] != k + 1) {
+                return k + 1;
+            }
+        }
+        return nums.length + 1;
+    }
+}
+```
