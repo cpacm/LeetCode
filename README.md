@@ -1644,3 +1644,35 @@ public class Solution {
     }
 }
 ```
+
+## 42. Trapping Rain Water
+题目：给出一组数字代表柱高，求能够容量的雨水体积。
+```
+Given [0,1,0,2,1,0,1,3,2,1,2,1], return 6.
+```
+![rain water](https://leetcode.com/static/images/problemset/rainwatertrap.png)
+
+与 ContainerWithMostWater 的思路类似，也是采取从两边向中间遍历的方法。我们使用两个指针，一个从左向右遍历，一个从右向左遍历。从左向右遍历时，记录下上次左边的峰值，如果右边一直没有比这个峰值高的，就已经加上这些差值。从右向左遍历时，记录下上次右边的峰值，如果左边一直没有比这个峰值高的，就加上这些差值。难点在于，当两个指针遍历到相邻的峰时，我们要选取较小的那个峰值来计算差值。所以，我们在遍历左指针或者右指针之前，要先判断左右两个峰值的大小。
+
+```java
+public class Solution {
+    public int trap(int[] height) {
+        int secHight = 0;
+        int left = 0;
+        int right = height.length - 1;
+        int area = 0;
+        while (left < right) {
+            if (height[left] < height[right]) {
+                secHight = Math.max(height[left], secHight);
+                area += secHight - height[left];
+                left++;
+            } else {
+                secHight = Math.max(height[right], secHight);
+                area += secHight - height[right];
+                right--;
+            }
+        }
+        return area;
+    }
+}
+```
