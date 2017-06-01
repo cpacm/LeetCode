@@ -1676,3 +1676,82 @@ public class Solution {
     }
 }
 ```
+
+## 43. Multiply Strings
+题目：输入两个由数字组成的字符串，求他们的乘积。两个字符串的长度小于110，且都是有0-9组成，没有包含前置0，不能用 BigInteger 或者直接将字符串转化成数字来进行计算。
+
+大数的乘法计算，我采取的是最传统的做法：挨个相乘并做大数的加法，最后得到解，算法并不算是最优解。
+```java
+public class Solution {
+    public String multiply(String num1, String num2) {
+        if (num1.equals("0") || num2.equals("0")) return "0";
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < num1.length(); i++) {
+            int k = num1.charAt(i) - '0';
+            if (result.length() != 0) {
+                result.append("0");
+            }
+            result = add(result, singleMul(k, num2));
+        }
+        return result.toString();
+    }
+
+    public StringBuilder add(StringBuilder s1, StringBuilder s2) {
+        int s = 0;
+        StringBuilder sb = new StringBuilder();
+        int len1 = s1.length() - 1;
+        int len2 = s2.length() - 1;
+        while (len1 >= 0 || len2 >= 0) {
+            int m1 = len1 >= 0 ? s1.charAt(len1) - '0' : 0;
+            int m2 = len2 >= 0 ? s2.charAt(len2) - '0' : 0;
+            sb.insert(0, (m1 + m2 + s) % 10);
+            s = (m1 + m2 + s) / 10;
+            len1--;
+            len2--;
+        }
+        if (s != 0) {
+            sb.insert(0, s);
+        }
+        return sb;
+    }
+
+    public StringBuilder singleMul(int num, String num2) {
+        StringBuilder sb = new StringBuilder();
+        int s = 0;
+        for (int i = num2.length() - 1; i >= 0; i--) {
+            int k = num2.charAt(i) - '0';
+            sb.insert(0, (num * k + s) % 10);
+            s = (num * k + s) / 10;
+        }
+        if (s != 0) {
+            sb.insert(0, s);
+        }
+        return sb;
+    }
+}
+```
+最优的解法是
+设两个数长度为m,n,然后定义一个数组a[m+n-1]，其各位乘积的规律为`a[i+j] += (num1.charAt(i)-'0')*(num2.charAt(j)-'0');`
+```java
+public class Solution {
+    public String multiply(String num1, String num2) {
+        if(num1.equals("0")||num2.equals("0")) return "0";
+        int m = num1.length(), n = num2.length();
+        int[] digits = new int[m + n -1];
+        for(int i=m-1; i>=0; i--){
+            for(int j=n-1; j>=0; j--){
+                digits[i+j] += (num1.charAt(i)-'0')*(num2.charAt(j)-'0');
+            }
+        }
+        int carry = 0;
+        String rs = "";
+        for(int i=m+n-2; i>=0; i--){
+            int temp = digits[i]+carry;
+            carry = temp/10;
+            rs = (temp%10) + rs;
+        }
+        rs = (carry==0?"":carry) + rs;
+        return rs;
+    }
+}
+```
