@@ -1755,3 +1755,50 @@ public class Solution {
     }
 }
 ```
+
+## 44. Wildcard Matching
+题目：字符串匹配
+```
+'?' Matches any single character.
+'*' Matches any sequence of characters (including the empty sequence).
+
+The matching should cover the entire input string (not partial).
+
+The function prototype should be:
+bool isMatch(const char *s, const char *p)
+
+Some examples:
+isMatch("aa","a") → false
+isMatch("aa","aa") → true
+isMatch("aaa","aa") → false
+isMatch("aa", "*") → true
+isMatch("aa", "a*") → true
+isMatch("ab", "?*") → true
+isMatch("aab", "c*a*b") → false
+```
+刚开始用的是递归算法，很遗憾的是TLE了，后面用的是暴力解法，当遇到 '\*' 号时做上标记，当后续无法继续匹配下去时回到 '\*' 的位置开始匹配
+```java
+public class Solution {
+    public boolean isMatch(String s, String p) {
+        int m = 0, n = 0, index = 0, star = -1;
+        while (m < s.length()) {
+            if (n < p.length() && (s.charAt(m) == p.charAt(n) || p.charAt(n) == '?')) {
+                m++;
+                n++;
+            } else if (n < p.length() && p.charAt(n) == '*') {
+                index = m;
+                star = n;
+                n++;
+            } else if (star != -1) {
+                n = star + 1;
+                index++;
+                m = index;
+            } else return false;
+        }
+        while (n < p.length() && p.charAt(n) == '*')
+            n++;
+        return n == p.length();
+    }
+
+}
+```
