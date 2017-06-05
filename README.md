@@ -1802,3 +1802,29 @@ public class Solution {
 
 }
 ```
+
+## 45. Jump Game II
+题目：跳棋。给出一组数据，里面的值表示为可跳的最大范围，求从第一个数可以跳到最后一个数最小的步数。
+```
+Given array A = [2,3,1,1,4]
+
+The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.)
+```
+动态规范，每一步都取 `i + nums[i]` 最大的那一步来走。
+```java
+public class Solution {
+    public int jump(int[] nums) {
+        int res = 0, i = 0, cur = 0, n = nums.length;
+        while (cur < n - 1) {
+            int pre = cur;
+            while (i <= pre) {
+                cur = Math.max(cur, i + nums[i]);
+                ++i;
+            }
+            ++res;
+            if (pre == cur) return -1;
+        }
+        return res;
+    }
+}
+```
