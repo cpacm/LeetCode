@@ -1828,3 +1828,49 @@ public class Solution {
     }
 }
 ```
+
+## 46. Permutations
+题目：给出一组不重复的数字，求其排列组合
+```
+ For example,
+[1,2,3] have the following permutations:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+```
+思路：每输入一个数，在原有的列表中每个数之间插入新的数生成新的组合。
+```java
+public class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i : nums) {
+            List<List<Integer>> temp = new ArrayList<>(result);
+            result.clear();
+            if (temp.size() == 0) {
+                List<Integer> list = new ArrayList<>();
+                list.add(i);
+                result.add(list);
+                continue;
+            }
+            for (List<Integer> list : temp) {
+                for (int k = 0; k <= list.size(); k++) {
+                    if (k == list.size()) {
+                        list.add(i);
+                        result.add(list);
+                        break;
+                    }
+                    List<Integer> ll = new ArrayList<>(list);
+                    ll.add(k, i);
+                    result.add(ll);
+                }
+            }
+        }
+        return result;
+    }
+}
+```
