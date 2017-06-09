@@ -1874,3 +1874,142 @@ public class Solution {
     }
 }
 ```
+
+## 47. Permutations II
+题目：给出一组数字，可能重复，求其排列组合，要求结果不能包含有重复排列。
+```
+ For example,
+[1,1,2] have the following unique permutations:
+[
+  [1,1,2],
+  [1,2,1],
+  [2,1,1]
+]
+```
+
+思路：使用46的思路是行不通的，因为不能有效的去重。可以先将数组排序，再通过深度优先搜索进行查找，同时将已经使用过的数字通过布尔数组进行记录。当遇到与前一个数字相等时，判断前一个数是否使用过，未使用则跳过。
+```java
+public class Solution {
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) return res;
+        boolean[] used = new boolean[nums.length];
+        List<Integer> list = new ArrayList<>();
+        Arrays.sort(nums);
+        unique(nums, used, list, res);
+        return res;
+    }
+
+    public void unique(int[] nums, boolean[] used, List<Integer> list, List<List<Integer>> res) {
+        if (list.size() == nums.length) {
+            res.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (used[i]) continue;
+            if (i > 0 && nums[i - 1] == nums[i] && !used[i - 1]) continue;
+            used[i] = true;
+            list.add(nums[i]);
+            unique(nums, used, list, res);
+            used[i] = false;
+            list.remove(list.size() - 1);
+        }
+    }
+}
+```
+
+## 48. Rotate Image
+题目：给出一组n x n二维数组，将其顺时针旋转，求旋转后的数组。
+
+将旋转后的数组和旋转前的数组比较一下可以得出一下规律:
+```
+旋转后——matrix[i][j]
+旋转前——matrix[n-1-j][i]
+```
+```java
+public class Solution {
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        if (n <= 1) return;
+        int[][] temp = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            System.arraycopy(matrix[i], 0, temp[i], 0, n);
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matrix[i][j] = temp[n - 1 - j][i];
+            }
+        }
+    }
+}
+```
+
+也可以不使用 temp 数组，直接变换
+```
+旋转前——matrix[i][j]
+旋转后——matrix[j][n-1-x]
+
+变化过程：swap(matrix[i][j], matrix[j][i]) —— swap(matrix[i][j], matrix[i][n-1-j]
+```
+```java
+public class Solution {
+    public void rotate(int[][] matrix) {
+        for(int i = 0; i<matrix.length; i++){
+            for(int j = i; j<matrix[0].length; j++){
+                int temp = 0;
+                temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
+        }
+        for(int i =0 ; i<matrix.length; i++){
+            for(int j = 0; j<matrix.length/2; j++){
+                int temp = 0;
+                temp = matrix[i][j];
+                matrix[i][j] = matrix[i][matrix.length-1-j];
+                matrix[i][matrix.length-1-j] = temp;
+            }
+        }
+    }
+}
+```
+
+## 49. Group Anagrams
+题目：给出一组字符串，将其按照字符的组成进行分类。
+```
+For example, given: ["eat", "tea", "tan", "ate", "nat", "bat"],
+Return:
+
+[
+  ["ate", "eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+```
+思路：将每一个字符串里面的字符进行排序放到HashMap中。
+```java
+public class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        List<List<String>> ll = new ArrayList<>();
+        if (strs.length <= 0) return ll;
+        Map<String, List<String>> map = new HashMap<>();
+        for (String str : strs) {
+            String sstr = sortStr(str);
+             if (map.containsKey(sstr)) {
+                map.get(sstr).add(str);
+            } else {
+                List<String> l = new ArrayList<>();
+                l.add(str);
+                map.put(sstr, l);
+            }
+        }
+        return new ArrayList<>(map.values());
+    }
+
+    public String sortStr(String str) {
+        char[] cc = str.toCharArray();
+        Arrays.sort(cc);
+        return String.valueOf(cc);
+    }
+}
+```

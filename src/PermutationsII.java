@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -7,36 +8,32 @@ import java.util.List;
 public class PermutationsII {
 
     public static void main(String[] args) {
-        System.out.println(permuteUnique(new int[]{1, 2, 3, 4, 6, 8, 998, 18}));
+        System.out.println(permuteUnique(new int[]{1, 2, 1, 4, 18}));
     }
 
     public static List<List<Integer>> permuteUnique(int[] nums) {
-        List<List<Integer>> result = new ArrayList<>();
-        for (int i : nums) {
-            List<List<Integer>> temp = new ArrayList<>(result);
-            result.clear();
-            if (temp.size() == 0) {
-                List<Integer> list = new ArrayList<>();
-                list.add(i);
-                result.add(list);
-                continue;
-            }
-            for (List<Integer> list : temp) {
-                for (int k = 0; k <= list.size(); k++) {
-                    if (k > 0 && list.get(k - 1) == i) {
-                        continue;
-                    }
-                    if (k == list.size()) {
-                        list.add(i);
-                        result.add(list);
-                        break;
-                    }
-                    List<Integer> ll = new ArrayList<>(list);
-                    ll.add(k, i);
-                    result.add(ll);
-                }
-            }
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) return res;
+        boolean[] used = new boolean[nums.length];
+        List<Integer> list = new ArrayList<>();
+        Arrays.sort(nums);
+        unique(nums, used, list, res);
+        return res;
+    }
+
+    public static void unique(int[] nums, boolean[] used, List<Integer> list, List<List<Integer>> res) {
+        if (list.size() == nums.length) {
+            res.add(new ArrayList<>(list));
+            return;
         }
-        return result;
+        for (int i = 0; i < nums.length; i++) {
+            if (used[i]) continue;
+            if (i > 0 && nums[i - 1] == nums[i] && !used[i - 1]) continue;
+            used[i] = true;
+            list.add(nums[i]);
+            unique(nums, used, list, res);
+            used[i] = false;
+            list.remove(list.size() - 1);
+        }
     }
 }
