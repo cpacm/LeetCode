@@ -2036,3 +2036,241 @@ public class Solution {
     }
 }
 ```
+
+## 51. N-Queens
+题目：经典的N皇后问题，给出一个NxN的棋盘,求所有皇后排列的组合。
+!(8-queens)[https://leetcode.com/static/images/problemset/8-queens.png]
+要保证皇后不能互相攻击，就必须要求任意两个皇后不在同一行，同一列和同一对角线上。
+
+```
+For example,
+There exist two distinct solutions to the 4-queens puzzle:
+[
+ [".Q..",  // Solution 1
+  "...Q",
+  "Q...",
+  "..Q."],
+
+ ["..Q.",  // Solution 2
+  "Q...",
+  "...Q",
+  ".Q.."]
+]
+```
+
+一个NP问题，开一个n大的数组，下标表示行值表示列。每加入一个值时先与之前放入数组的值进行判断是否符合规则，符合规则继续下一个。
+
+```java
+public class Solution {
+    private List<List<String>> resultList = new ArrayList<>();
+    private int[] positions;
+    private char[] tags;
+
+    public List<List<String>> solveNQueens(int n) {
+        positions = new int[n];
+        tags = new char[n];
+        Arrays.fill(positions, -1);
+        Arrays.fill(tags, '.');
+        dp(0, n);
+        return resultList;
+    }
+
+    public void dp(int n, int max) {
+        if (n == max) {
+            List<String> qLine = new ArrayList<>();
+            for (int i = 0; i < positions.length; i++) {
+                tags[positions[i]] = 'Q';
+                String q = new String(tags);
+                qLine.add(q);
+                tags[positions[i]] = '.';
+            }
+            resultList.add(qLine);
+            return;
+        }
+        int valueX = n;
+        int valueY = 0;
+        while (valueY < max) {
+            if (hasPlaced(n, valueX, valueY)) {
+                positions[n] = valueY;
+                dp(n + 1, max);
+            }
+            valueY++;
+        }
+    }
+
+    public boolean hasPlaced(int n, int valueX, int valueY) {
+        for (int j = 0; j < n; j++) {
+            int x = j;
+            int y = positions[j];
+            if (positions[j] == valueY || Math.abs(valueX - x) == Math.abs(valueY - y)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+## 52. N-Queens II
+与上一题一样的题目，不过是求组合的个数而不需要将组合罗列出来
+```java
+public class Solution {
+    private int count = 0;
+    private int[] positions;
+
+    public int totalNQueens(int n) {
+        positions = new int[n];
+        Arrays.fill(positions, -1);
+        dp(0, n);
+        return count;
+    }
+
+    public void dp(int n, int max) {
+        if (n == max) {
+            count++;
+            return;
+        }
+        int valueX = n;
+        int valueY = 0;
+        while (valueY < max) {
+            if (hasPlaced(n, valueX, valueY)) {
+                positions[n] = valueY;
+                dp(n + 1, max);
+            }
+            valueY++;
+        }
+    }
+
+    public boolean hasPlaced(int n, int valueX, int valueY) {
+        for (int j = 0; j < n; j++) {
+            int x = j;
+            int y = positions[j];
+            if (positions[j] == valueY || Math.abs(valueX - x) == Math.abs(valueY - y)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+## 53. Maximum Subarray
+题目：给出一个数组，求一个和最大的子数组。
+```
+For example, given the array [-2,1,-3,4,-1,2,1,-5,4],
+the contiguous subarray [4,-1,2,1] has the largest sum = 6.
+```
+需要一个额外的数组来维护每个位置的最大值，以便进行下一个位置最大值的计算。
+
+```java
+public class Solution {
+    public int maxSubArray(int[] nums) {
+        int[] total = new int[nums.length];
+        total[0] = nums[0];
+        int totalMax = total[0];
+        for (int i = 1; i < nums.length; i++) {
+            total[i] = Math.max(nums[i], nums[i] + total[i - 1]);
+            totalMax = Math.max(totalMax, total[i]);
+        }
+        return totalMax;
+    }
+}
+```
+
+## 54. Spiral Matrix
+题目：给出一组m x n 的二维数字数组，返回螺旋顺序的数字列表。
+```
+Given the following matrix:
+
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+
+You should return [1,2,3,6,9,8,7,4,5].
+```
+将螺旋的顺序分解开来，可以分成4种顺序，依次为从左向右，从上向下，从左向右，从下向上。定义4个变量分别为`m-剩下的行数`,`n-剩下的列数`,`startM-行开始的坐标`,`startN-列开始的地方`。
+接下来就是按顺序求列表了。
+```java
+public class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> s = new ArrayList<>();
+        int m = matrix.length;
+        if(m == 0) return s;
+        int n = matrix[0].length;
+        int startM = 0, startN = 0;
+        while (m > 0 && n > 0) {
+            spiral1(startM, startN, m, n, matrix, s);
+            startM++;
+            m--;
+            if (m <= 0 || n <= 0) return s;
+            spiral2(startM, startN, m, n, matrix, s);
+            n--;
+            if (m <= 0 || n <= 0) return s;
+            spiral3(startM, startN, m, n, matrix, s);
+            m--;
+            if (m <= 0 || n <= 0) return s;
+            spiral4(startM, startN, m, n, matrix, s);
+            startN++;
+            n--;
+        }
+        return s;
+    }
+
+    public void spiral1(int startM, int startN, int m, int n, int[][] matrix, List<Integer> s) {
+        for (int k = startN; k < n + startN; k++) {
+            s.add(matrix[startM][k]);
+        }
+    }
+
+    public void spiral2(int startM, int startN, int m, int n, int[][] matrix, List<Integer> s) {
+        for (int k = startM; k < m + startM; k++) {
+            s.add(matrix[k][n + startN - 1]);
+        }
+    }
+
+    public void spiral3(int startM, int startN, int m, int n, int[][] matrix, List<Integer> s) {
+        for (int k = startN + n - 1; k >= startN; k--) {
+            s.add(matrix[startM + m - 1][k]);
+        }
+    }
+
+    public void spiral4(int startM, int startN, int m, int n, int[][] matrix, List<Integer> s) {
+        for (int k = m + startM - 1; k >= startM; k--) {
+            s.add(matrix[k][startN]);
+        }
+    }
+}
+```
+
+## 55. Jump Game
+题目：跳棋，给出一组数字，每个数字代表当前可以跳过的最大距离，求是否能够从第一个位置达到最后一个位置。
+```
+ For example:
+A = [2,3,1,1,4], return true.
+
+A = [3,2,1,0,4], return false.
+```
+要先记录每个位置能够跳到的最远距离，特殊处理当数值为0时能够跳过去。
+```java
+public class Solution {
+    public boolean canJump(int[] nums) {
+        if (nums.length <= 1) return true;
+        if (nums[0] == 0) return false;
+        int[] maxs = new int[nums.length];
+        maxs[0] = nums[0];
+        for (int i = 1; i < nums.length - 1; i++) {
+            if (nums[i] == 0) {
+                if (maxs[i - 1] <= 1) {
+                    return false;
+                }
+                maxs[i] = maxs[i - 1] - 1;
+            }
+            maxs[i] = Math.max(maxs[i - 1] - 1, nums[i]);
+        }
+        return true;
+    }
+
+}
+```
