@@ -2039,7 +2039,7 @@ public class Solution {
 
 ## 51. N-Queens
 题目：经典的N皇后问题，给出一个NxN的棋盘,求所有皇后排列的组合。
-!(8-queens)[https://leetcode.com/static/images/problemset/8-queens.png]
+![8-queens](https://leetcode.com/static/images/problemset/8-queens.png)
 要保证皇后不能互相攻击，就必须要求任意两个皇后不在同一行，同一列和同一对角线上。
 
 ```
@@ -2190,7 +2190,7 @@ Given the following matrix:
 
 You should return [1,2,3,6,9,8,7,4,5].
 ```
-将螺旋的顺序分解开来，可以分成4种顺序，依次为从左向右，从上向下，从左向右，从下向上。定义4个变量分别为`m-剩下的行数`,`n-剩下的列数`,`startM-行开始的坐标`,`startN-列开始的地方`。
+将螺旋的顺序分解开来，可以分成4种顺序，依次为从左向右，从上向下，从右向左，从下向上。定义4个变量分别为`m-剩下的行数`,`n-剩下的列数`,`startM-行开始的坐标`,`startN-列开始的地方`。
 接下来就是按顺序求列表了。
 ```java
 public class Solution {
@@ -2272,5 +2272,262 @@ public class Solution {
         return true;
     }
 
+}
+```
+
+## 56. Merge Intervals
+题目：给出一组包含闭合线段的对象数组，求去除重叠后的对象数组。
+```
+Given [1,3],[2,6],[8,10],[15,18],
+return [1,6],[8,10],[15,18].
+```
+先将给出的数组按线段的开头进行排序（快排或者归并排序），之后就可以每加入一个线段只需要跟前一个线段判断是否重复就可以了。
+```java
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+public class Solution {
+    public List<Interval> merge(List<Interval> intervals) {
+        if (intervals.size() <= 1) return intervals;
+        quickSort(0, intervals.size() - 1, intervals);
+        List<Interval> res = new ArrayList<>();
+        for (Interval interval : intervals) {
+            if (res.size() == 0) {
+                res.add(interval);
+                continue;
+            }
+            Interval pastInterval = res.get(res.size() - 1);
+            if (interval.start > pastInterval.end) {
+                res.add(interval);
+            } else {
+                pastInterval.end = Math.max(pastInterval.end, interval.end);
+            }
+        }
+        return res;
+    }
+
+    public void quickSort(int start, int end, List<Interval> intervals) {
+        if (start >= end) return;
+        int startTemp = start;
+        int endTemp = end;
+        Interval value = intervals.get(start);
+        while (start < end) {
+            while (intervals.get(end).start >= value.start && end > start)
+                end--;
+            intervals.set(start, intervals.get(end));
+            while (intervals.get(start).start <= value.start && end > start)
+                start++;
+            intervals.set(end, intervals.get(start));
+        }
+        intervals.set(start, value);
+        quickSort(startTemp, end, intervals);
+        quickSort(end + 1, endTemp, intervals);
+    }
+}
+```
+
+## 57. Insert Interval
+题目：给出一组已经有序的线段数组，插入一个新的线段，求去重复的新数组。
+```
+ Example 1:
+Given intervals [1,3],[6,9], insert and merge [2,5] in as [1,5],[6,9].
+
+Example 2:
+Given [1,2],[3,5],[6,7],[8,10],[12,16], insert and merge [4,9] in as [1,2],[3,10],[12,16].
+
+This is because the new interval [4,9] overlaps with [3,5],[6,7],[8,10].
+```
+一道逻辑判断题，先根据各种边界条件加入新的线段（主要根据start插入新的线段，end之后再处理），之后再处理end的边界问题。
+```java
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+public class Solution {
+    public List<Interval> insert(List<Interval> intervals, Interval newInterval) {
+        if (intervals.size() <= 0) {
+            intervals.add(newInterval);
+            return intervals;
+        }
+        int position = -1;
+        for (int i = 0; i < intervals.size(); i++) {
+            Interval interval = intervals.get(i);
+            if (interval.start <= newInterval.start && interval.end >= newInterval.start) {
+                position = intervals.indexOf(interval);
+                interval.end = Math.max(interval.end, newInterval.end);
+                break;
+            } else if (interval.start >= newInterval.start && interval.start <= newInterval.end) {
+                position = intervals.indexOf(interval);
+                interval.start = newInterval.start;
+                interval.end = Math.max(interval.end, newInterval.end);
+                break;
+            } else if (interval.start > newInterval.start) {
+                int index = intervals.indexOf(interval);
+                intervals.add(index, newInterval);
+                break;
+            } else if (i == intervals.size() - 1) {
+                intervals.add(newInterval);
+                break;
+            }
+        }
+        if (position != -1) {
+            int index = position + 1;
+            Interval interval = intervals.get(position);
+            while (true) {
+                if (index >= intervals.size()) {
+                    break;
+                }
+                Interval lastInterval = intervals.get(index);
+                if (lastInterval.start > interval.end) {
+                    break;
+                }
+                interval.end = Math.max(interval.end, lastInterval.end);
+                intervals.remove(lastInterval);
+            }
+        }
+        return intervals;
+    }
+}
+```
+
+## 58. Length of Last Word
+题目：给出一个字符串，包含字符和空格，求最后一个单词的字数。
+```
+Given s = "Hello World",
+return 5.
+```
+反向遍历，返回碰到空格时碰到的个数。
+```java
+public class Solution {
+    public int lengthOfLastWord(String s) {
+        if (s == null || s.length() == 0) return 0;
+        int total = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if (s.charAt(i) == ' ') {
+                if (total == 0) continue;
+                else return total;
+            }
+            total++;
+        }
+        return total;
+    }
+}
+```
+
+## 59. Spiral Matrix II
+题目：类似题目54，以螺旋的顺序将n*n的数字填入二维数组中。
+```
+Given n = 3,
+You should return the following matrix:
+[
+ [ 1, 2, 3 ],
+ [ 8, 9, 4 ],
+ [ 7, 6, 5 ]
+]
+```
+```java
+public class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] matrix = new int[n][n];
+        int k = 1;
+        int startM = 0, startN = 0;
+        int m = n;
+        while (m > 0 && n > 0) {
+            k = spiral1(startM, startN, m, n, matrix, k);
+            startM++;
+            m--;
+            if (m <= 0 || n <= 0) return matrix;
+            k = spiral2(startM, startN, m, n, matrix, k);
+            n--;
+            if (m <= 0 || n <= 0) return matrix;
+            k = spiral3(startM, startN, m, n, matrix, k);
+            m--;
+            if (m <= 0 || n <= 0) return matrix;
+            k = spiral4(startM, startN, m, n, matrix, k);
+            startN++;
+            n--;
+        }
+        return matrix;
+    }
+
+    public int spiral1(int startM, int startN, int m, int n, int[][] matrix, int s) {
+        for (int k = startN; k < n + startN; k++) {
+            matrix[startM][k] = s++;
+        }
+        return s;
+    }
+
+    public int spiral2(int startM, int startN, int m, int n, int[][] matrix, int s) {
+        for (int k = startM; k < m + startM; k++) {
+            matrix[k][n + startN - 1] = s++;
+        }
+        return s;
+    }
+
+    public int spiral3(int startM, int startN, int m, int n, int[][] matrix, int s) {
+        for (int k = startN + n - 1; k >= startN; k--) {
+            matrix[startM + m - 1][k] = s++;
+        }
+        return s;
+    }
+
+    public int spiral4(int startM, int startN, int m, int n, int[][] matrix, int s) {
+        for (int k = m + startM - 1; k >= startM; k--) {
+            matrix[k][startN] = s++;
+        }
+        return s;
+    }
+}
+```
+
+## 60. Permutation Sequence
+题目：求出n个数字的第k个排列组合，规律
+```
+a1 = k / (n - 1)!
+k1 = k
+
+a2 = k1 / (n - 2)!
+k2 = k1 % (n - 2)!
+...
+
+an-1 = kn-2 / 1!
+kn-1 = kn-2 / 1!
+
+an = kn-1 / 0!
+kn = kn-1 % 0!
+
+```
+
+```java
+public class Solution {
+    public String getPermutation(int n, int k) {
+        int data[] = new int[n + 1];
+        boolean visited[] = new boolean[n + 1];
+        data[0] = data[1] = 1;
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        for (int i = 1; i <= n; i++) {
+            data[i] = data[i - 1] * (i);
+            list.add(i);
+        }
+        String result = "";
+        k--;
+        for (int i = n - 1; i >= 0; i--) {
+            int cur = k / data[i];
+            result += list.remove(cur);
+            k = k % data[i];
+        }
+        return result;
+    }
 }
 ```
