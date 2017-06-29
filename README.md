@@ -2531,3 +2531,48 @@ public class Solution {
     }
 }
 ```
+
+## 61. Rotate List
+题目：倒着数k个node，从那开始到结尾和之前那部分对调，那个例子就是，4->5拿前面来，1->2->3拿后面去。
+几个特殊：
+k是可以大于整个list的长度的，所以这时要对k对len取模
+如果取模之后得0，相当于不用rotate，直接返回
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        int count = 1;
+        ListNode temp = head;
+        ListNode last = head;
+        while (last.next != null) {
+            last = last.next;
+            count++;
+        }
+        k = k % count;
+        int index = count - k;
+        if (index <= 0) {
+            return head;
+        }
+        index--;
+        while (index > 0) {
+            temp = temp.next;
+            index--;
+        }
+        last.next = head;
+        head = temp.next;
+        temp.next = null;
+        return head;
+    }
+}
+```
