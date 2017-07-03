@@ -2576,3 +2576,77 @@ public class Solution {
     }
 }
 ```
+
+## 62. Unique Paths
+题目：一个`mxn`的空间内，求左上角到右下角的路线共有多少条。
+![route](https://leetcode.com/static/images/problemset/robot_maze.png)
+
+一道很简单的动态规划题，当前的路线数
+> a[m][n] = a[m-1][n]+a[m][n-1]
+
+```java
+public class Solution {
+    public int uniquePaths(int m, int n) {
+        if (m == 0 || n == 0) return 0;
+        if (m == 1 || n == 1) return 1;
+        int[][] a = new int[m][n];
+        Arrays.fill(a[0], 1);
+        for (int i = 1; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j == 0) {
+                    a[i][j] = 1;
+                } else {
+                    a[i][j] = a[i - 1][j] + a[i][j - 1];
+                }
+            }
+        }
+        return a[m - 1][n - 1];
+    }
+}
+```
+
+## 63. Unique Paths II
+题目：题意跟上一题一样，只不过在mxn的空间里面加上障碍物妨碍路线。
+
+思路跟上一题一样，只不过碰到障碍物时设置当前的位置的可到达路线为0
+
+```java
+public class Solution {
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        if (m == 0) return 0;
+        int n = obstacleGrid[0].length;
+        if (n == 0) return 0;
+        int a[][] = new int[m][n];
+        if (obstacleGrid[0][0] > 0) {
+            a[0][0] = 0;
+        } else {
+            a[0][0] = 1;
+        }
+        for (int i = 1; i < n; i++) {
+            if (obstacleGrid[0][i] > 0) {
+                a[0][i] = 0;
+            } else {
+                a[0][i] = a[0][i - 1];
+            }
+        }
+        for (int i = 1; i < m; i++) {
+            if (obstacleGrid[i][0] > 0) {
+                a[i][0] = 0;
+            } else {
+                a[i][0] = a[i - 1][0];
+            }
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] > 0) {
+                    a[i][j] = 0;
+                } else {
+                    a[i][j] = a[i - 1][j] + a[i][j - 1];
+                }
+            }
+        }
+        return a[m - 1][n - 1];
+    }
+}
+```
