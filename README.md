@@ -2650,3 +2650,92 @@ public class Solution {
     }
 }
 ```
+
+## 64. Minimum Path Sum
+题目：题目与62相似，不过这次不是求路径的可达数而是求最小路径值。
+
+同样是动态规划，数组维护的到达每个位置的最小值。
+
+```java
+public class Solution {
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        if (m == 0) return 0;
+        int n = grid[0].length;
+        if (n == 0) return 0;
+        int a[][] = new int[m][n];
+        a[0][0] = grid[0][0];
+        for (int i = 1; i < m; i++) {
+            a[i][0] = a[i - 1][0] + grid[i][0];
+        }
+        for (int i = 1; i < n; i++) {
+            a[0][i] = a[0][i - 1] + grid[0][i];
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                a[i][j] = Math.min(a[i - 1][j], a[i][j - 1]) + grid[i][j];
+            }
+        }
+        return a[m - 1][n - 1];
+    }
+}
+```
+
+## 65. Valid Number
+题目：给出一个字符串，判断是否是有效的数值
+```
+"0" => true
+" 0.1 " => true
+"abc" => false
+"1 a" => false
+"2e10" => true
+
+// 更详细的测试案例，源自讨论区
+test(1, "123", true);
+test(2, " 123 ", true);
+test(3, "0", true);
+test(4, "0123", true);  //Cannot agree
+test(5, "00", true);  //Cannot agree
+test(6, "-10", true);
+test(7, "-0", true);
+test(8, "123.5", true);
+test(9, "123.000000", true);
+test(10, "-500.777", true);
+test(11, "0.0000001", true);
+test(12, "0.00000", true);
+test(13, "0.", true);  //Cannot be more disagree!!!
+test(14, "00.5", true);  //Strongly cannot agree
+test(15, "123e1", true);
+test(16, "1.23e10", true);
+test(17, "0.5e-10", true);
+test(18, "1.0e4.5", false);
+test(19, "0.5e04", true);
+test(20, "12 3", false);
+test(21, "1a3", false);
+test(22, "", false);
+test(23, "     ", false);
+test(24, null, false);
+test(25, ".1", true); //Ok, if you say so
+test(26, ".", false);
+test(27, "2e0", true);  //Really?!
+test(28, "+.8", true);
+test(29, " 005047e+6", true);  //Damn = =|||
+```
+
+可以借助 `Double.parseDouble()` 方法try catch获取true或false,也可以使用正则表达式。
+ ```java
+ //Pattern.matches("(\\+|-)?(\\d+(\\.\\d*)?|\\.\\d+)(e(\\+|-)?\\d+)?", s);
+
+ public class Solution {
+     public boolean isNumber(String s) {
+         if (s.endsWith("f") || s.endsWith("d")||s.endsWith("F") || s.endsWith("D"))
+             return false;
+         try {
+             double d = Double.parseDouble(s);
+             return true;
+         } catch (Exception e) {
+             return false;
+         }
+     }
+ }
+ ```
