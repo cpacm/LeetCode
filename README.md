@@ -2739,3 +2739,76 @@ test(29, " 005047e+6", true);  //Damn = =|||
      }
  }
  ```
+
+ ## 66. Plus One
+ 题目：给出一组数组，每个位置放置一个非0数字，将数组作为一个数值考虑，求将其+1后的数值。
+
+ 一道很简单的问题，主要考虑的还是临界点的进位问题。
+
+ ```java
+ public class Solution {
+     public int[] plusOne(int[] digits) {
+         int len = digits.length;
+         if (len <= 0) return digits;
+         int temp = 1;
+         for (int i = len - 1; i >= 0; i--) {
+             if (digits[i] + temp >= 10) {
+                 digits[i] = 0;
+                 temp = 1;
+             } else {
+                 digits[i] = digits[i] + 1;
+                 temp = 0;
+                 break;
+             }
+         }
+         if (temp == 1) {
+             int[] newD = new int[len + 1];
+             System.arraycopy(digits, 0, newD, 1, len);
+             newD[0] = 1;
+             return newD;
+         }
+         return digits;
+     }
+ }
+ ```
+
+## 67. Add Binary
+题目：两个二进制字符串相加，求和。
+```
+a = "11"
+b = "1"
+Return "100".
+```
+一道很简单的后序相加问题。
+```java
+public class Solution {
+    public String addBinary(String a, String b) {
+        int m = a.length();
+        int n = b.length();
+        if (m == 0) return b;
+        if (n == 0) return a;
+        m = m - 1;
+        n = n - 1;
+        String k = "";
+        int temp = 0;
+        while (m >= 0 || n >= 0) {
+            int aa = m >= 0 ? a.charAt(m) - '0' : 0;
+            int bb = n >= 0 ? b.charAt(n) - '0' : 0;
+            int r = aa + bb + temp;
+            if (r >= 2) {
+                r = r - 2;
+                temp = 1;
+            } else {
+                temp = 0;
+            }
+            k = r + k;
+            m--;
+            n--;
+        }
+        if (temp == 1) {
+            k = temp + k;
+        }
+        return k;
+    }
+}
+```
