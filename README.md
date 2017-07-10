@@ -2812,3 +2812,112 @@ public class Solution {
     }
 }
 ```
+
+## 68. Text Justification
+题目：分行。给出一组词，按照给出的长度给这些词分行，词与词之间用一个空格或多个分开且词紧靠保证左右两边，最后一行除外。
+```
+For example,
+words: ["This", "is", "an", "example", "of", "text", "justification."]
+L: 16.
+
+Return the formatted lines as:
+[
+   "This    is    an",
+   "example  of text",
+   "justification.  "
+]
+
+```
+
+先求出每行能够容纳多少词，再在每个词之间填充空格保证对齐。
+
+```java
+public class Solution {
+    public List<String> fullJustify(String[] words, int L) {
+        List<String> lines = new ArrayList<String>();
+
+        int index = 0;
+        while (index < words.length) {
+            int count = words[index].length();
+            int last = index + 1;
+            while (last < words.length) {
+                if (words[last].length() + count + 1 > L) break;
+                count += words[last].length() + 1;
+                last++;
+            }
+
+            StringBuilder builder = new StringBuilder();
+            int diff = last - index - 1;
+            // if last line or number of words in the line is 1, left-justified
+            if (last == words.length || diff == 0) {
+                for (int i = index; i < last; i++) {
+                    builder.append(words[i] + " ");
+                }
+                builder.deleteCharAt(builder.length() - 1);
+                for (int i = builder.length(); i < L; i++) {
+                    builder.append(" ");
+                }
+            } else {
+                // middle justified
+                int spaces = (L - count) / diff;
+                int r = (L - count) % diff;
+                for (int i = index; i < last; i++) {
+                    builder.append(words[i]);
+                    if (i < last - 1) {
+                        for (int j = 0; j <= (spaces + ((i - index) < r ? 1 : 0)); j++) {
+                            builder.append(" ");
+                        }
+                    }
+                }
+            }
+            lines.add(builder.toString());
+            index = last;
+        }
+
+
+        return lines;
+    }
+}
+```
+
+## 69. Sqrt(x)
+题目：整数开根
+
+牛顿迭代法：`xi+1= (xi + n/xi) / 2`
+
+```java
+public class Solution {
+    public int mySqrt(int x) {
+        if (x == 0) return 0;
+        double last = 0;
+        double res = 1;
+        while (res != last)
+        {
+            last = res;
+            res = (res + x / res) / 2;
+        }
+        return (int)res;
+    }
+}
+```
+
+## 70. Climbing Stairs
+题目：爬楼梯，每次可以向上爬1或2步，求爬到第n层楼梯有多少种走法。
+
+一个斐波那数的应用
+
+```java
+public class Solution {
+    public int climbStairs(int n) {
+        if (n == 0 || n == 1 || n == 2) return n;
+        int cs[] = new int[n+1];
+        cs[0] = 0;
+        cs[1] = 1;
+        cs[2] = 2;
+        for (int i = 3; i <= n; i++) {
+            cs[i] = cs[i - 1] + cs[i - 2];
+        }
+        return cs[n];
+    }
+}
+```
